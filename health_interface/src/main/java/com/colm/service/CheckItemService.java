@@ -1,4 +1,4 @@
 package com.colm.service;
 
-public class CheckItemService {
+public interface CheckItemService {
 }

@@ -86,6 +86,7 @@
             <groupId>com.alibaba</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
+        <!-- zk -->
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>

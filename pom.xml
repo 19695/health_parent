@@ -139,7 +139,7 @@
                 <artifactId>mybatis-spring</artifactId>
                 <version>${mybatis.spring.version}</version>
             </dependency>
-            <!-- github上有一个专门针对mybatis的物理分页开源项目 -->
+            <!-- github上一个专门针对mybatis的物理分页开源项目 -->
             <dependency>
                 <groupId>com.github.miemiedev</groupId>
                 <artifactId>mybatis-paginator</artifactId>

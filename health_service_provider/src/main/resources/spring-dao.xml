@@ -22,7 +22,8 @@
         <property name="username" value="root" />
         <property name="password" value="root" />
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/health" />
+        <!-- 阿里云 RDS -->
+        <property name="url" value="jdbc:mysql://rm-bp1e773a2h0ip7j1doo.mysql.rds.aliyuncs.com:3306/health" />
     </bean>
     <!--spring和mybatis整合的工厂bean-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
