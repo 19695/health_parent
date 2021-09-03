@@ -140,3 +140,63 @@ Fast-forward
 
 ```
 
+push 的时候遇到了同样的问题
+![img.png](imgs/img.png)
+
+```shell
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git config --global http.sslVerify "false"
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git push origin master
+fatal: unable to access 'https://github.com/19695/health_parent.git/': OpenSSL SSL_read: Connection was reset, errno 10054
+
+```
+
+没有起到作用，考虑将 https 替换为 git
+
+```shell
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+git remote -v
+origin  https://github.com/19695/health_parent.git (fetch)
+origin  https://github.com/19695/health_parent.git (push)
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote -v
+origin  https://github.com/19695/health_parent.git (fetch)
+origin  https://github.com/19695/health_parent.git (push)
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote --help
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote rm origin
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote -v
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote add origin git@github.com:19695/health_parent.git
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git remote -v
+origin  git@github.com:19695/health_parent.git (fetch)
+origin  git@github.com:19695/health_parent.git (push)
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git push origin master
+The authenticity of host 'github.com (52.74.223.119)' can't be established.
+RSA key fingerprint is SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'github.com,52.74.223.119' (RSA) to the list of known hosts.
+Enumerating objects: 9, done.
+Counting objects: 100% (9/9), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 93.97 KiB | 239.00 KiB/s, done.
+Total 7 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To github.com:19695/health_parent.git
+   0c80952..ec99349  master -> master
+
+```
