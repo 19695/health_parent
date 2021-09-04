@@ -8,4 +8,14 @@
            where code = #{value} or name = #{value} or helpCode = #{value}
        </if>
    </select>
+
+    <select id="findById" resultType="com.colm.pojo.CheckGroup"> <!--parameterType="int">-->
+        select *
+        from t_checkgroup
+        where id = #{groupId}
+    </select>
+
+    <select id="findCheckItemIdsByCheckGroupId" resultType="int"><!-- parameterType="int">-->
+        select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{groupId}
+    </select>
 </mapper>
