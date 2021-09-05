@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SystemMenuService {
     List<Menu> getAll();
+    String getDefault();
 }

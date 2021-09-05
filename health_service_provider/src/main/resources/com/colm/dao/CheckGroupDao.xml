@@ -18,4 +18,20 @@
     <select id="findCheckItemIdsByCheckGroupId" resultType="int"><!-- parameterType="int">-->
         select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{groupId}
     </select>
+
+    <insert id="add" parameterType="com.colm.pojo.CheckGroup">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_checkgroup(code,name,sex,helpCode,remark,attention)
+        values(#{code}, #{name}, #{sex}, #{helpCode}, #{remark}, #{attention})
+    </insert>
+
+    <insert id="setCheckGroupAssociateCheckItems">
+        insert into t_checkgroup_checkitem(checkgroup_id, checkitem_id) values
+        <foreach collection="itemIds" separator="," item="id">
+            (#{groupId}, #{id})
+        </foreach>
+    </insert>
+
 </mapper>

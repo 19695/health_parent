@@ -69,7 +69,7 @@
                 </el-menu>
             </el-aside>
             <el-container>
-                <iframe name="right" class="el-main" src="checkitem.html" width="100%" height="93%" frameborder="0"></iframe>
+                <iframe name="right" class="el-main" :src="defaultPage" width="100%" height="93%" frameborder="0"></iframe>
             </el-container>
         </el-container>
     </el-container>
@@ -89,10 +89,19 @@
                     console.log(res.data.data);
                     this.menuList = res.data.data;
                 } else {
-
+                    this.$message.error("查询菜单失败，请重试！");
                 }
             }).catch(() => {
-
+                this.$message.error("查询菜单失败，请重试！");
+            });
+            axios.get("/menu/default.do").then((res) => {
+                if(res.data.flag) {
+                    this.defaultPage = res.data.data;
+                } else {
+                    this.$message.error("获取展示页失败，请重试！");
+                }
+            }).catch(() => {
+                this.$message.error("获取展示页失败，请重试！");
             });
         },
         data:{
@@ -191,7 +200,8 @@
                     ]
                 }
             ]*/
-            menuList: []
+            menuList: [],
+            defaultPage: ''
         }
     });
     $(function() {

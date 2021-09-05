@@ -368,3 +368,77 @@ public Result findById(@RequestParam Integer id) {
 public Result findCheckItemIdsByCheckGroupId(@RequestParam("id") String groupId) {
 ```
 
+
+
+## 知识记录
+
+### mybaits insert
+
+Q：执行 insert 之后的返回值？
+
+A：默认会返回插入的记录数，也可以通过不同的手段使得除了返回记录数之外将我们的主键值填充到我们的实体中
+
+填充的方式有两种
+
+方式一：支持主键自增的数据库（如 MySQL）
+
+```xml
+<insert id="add" parameterType="EStudent" useGeneratedKeys="true" keyProperty="id">
+  insert into TStudent(name, age) values(#{name}, #{age})
+</insert>
+```
+
+方式二：不支持主键自增的数据库（如 Oracle）
+
+```xml
+<insert id="add" parameterType="EStudent">
+  <selectKey keyProperty="id" resultType="_long" order="BEFORE">
+    select CAST(RANDOM * 100000 as INTEGER) a FROM SYSTEM.SYSDUMMY1
+  </selectKey>
+  insert into TStudent(id, name, age) values(#{id}, #{name}, #{age})
+</insert>
+```
+
+参考：https://www.cnblogs.com/jpfss/p/11629873.html
+
+本项目使用的方式：
+
+```xml
+<insert id="add" parameterType="com.itheima.pojo.CheckGroup">
+    <!--通过mybatis框架提供的selectKey标签获得自增产生的ID值-->
+    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+        select LAST_INSERT_ID()
+    </selectKey>
+    insert into t_checkgroup(code,name,sex,helpCode,remark,attention)
+    values
+    (#{code},#{name},#{sex},#{helpCode},#{remark},#{attention})
+</insert>
+```
+
+
+
+### MySQL 外键
+
+* restrict方式 
+    * 同no action, 都是立即检查外键约束   
+    * 限制，指的是如果字表引用父表的某个字段的值，那么不允许直接删除父表的该值；
+
+* cascade方式 
+    * 在父表上update/delete记录时，同步update/delete掉子表的匹配记录 On delete cascade从mysql3.23.50开始可用; 
+    * on update cascade从mysql4.0.8开始可用 
+    * 级联，删除父表的某条记录，子表中引用该值的记录会自动被删除；
+
+* No action方式 
+    * 如果子表中有匹配的记录,则不允许对父表对应候选键进行update/delete操作 
+    * 这个是ANSI SQL-92标准,从mysql4.0.8开始支持 
+    * 无参照完整性关系，有了也不生效。
+
+* set null方式 
+    * 在父表上update/delete记录时，将子表上匹配记录的列设为null 要注意子表的外键列不能为not null On delete set null
+    * 从mysql3.23.50开始可用;
+    * on update set null从mysql4.0.8开始可用
+
+
+
+### mybatis 批量 insert
+

@@ -1,17 +1,21 @@
 package com.colm.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.colm.constant.MessageConstant;
 import com.colm.dao.CheckGroupDao;
 import com.colm.entity.PageResult;
 import com.colm.entity.QueryPageBean;
+import com.colm.entity.Result;
 import com.colm.pojo.CheckGroup;
 import com.colm.service.CheckGroupService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service(interfaceClass = CheckGroupService.class)
@@ -39,5 +43,24 @@ public class CheckGroupServiceImpl implements CheckGroupService {
     @Override
     public List<Integer> findCheckItemIdsByCheckGroupId(String groupId) {
         return checkGroupDao.findCheckItemIdsByCheckGroupId(groupId);
+    }
+
+    @Override
+    public Result add(List<Integer> itemIds, CheckGroup checkGroup) {
+        if(checkGroup == null) {
+            throw new RuntimeException("检查组信息必须填写！");
+        }
+        int count = checkGroupDao.add(checkGroup);
+        if(count > 0) {
+            Integer groupId = checkGroup.getId();
+            if(groupId != null && !CollectionUtils.isEmpty(itemIds)) {
+                int associateCount = checkGroupDao.setCheckGroupAssociateCheckItems(groupId, itemIds);
+                if(associateCount < 0) {
+                    return new Result(false, MessageConstant.ADD_CHECKGROUP_FAIL);
+                }
+            }
+            return new Result(true, MessageConstant.ADD_CHECKGROUP_SUCCESS);
+        }
+        return new Result(false, MessageConstant.ADD_CHECKGROUP_FAIL);
     }
 }

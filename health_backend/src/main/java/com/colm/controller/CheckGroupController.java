@@ -18,6 +18,16 @@ public class CheckGroupController {
     @Reference
     private CheckGroupService checkGroupService;
 
+    @PostMapping("/add")
+    public Result add(@RequestParam("checkItemIds") List<Integer> itemIds, @RequestBody CheckGroup checkGroup) {
+        try {
+            return checkGroupService.add(itemIds, checkGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, MessageConstant.ADD_CHECKGROUP_FAIL);
+        }
+    }
+
     @PostMapping("/findPage")
     public PageResult findPage(@RequestBody QueryPageBean queryPageBean) {
         return checkGroupService.pageQuery(queryPageBean);

@@ -28,5 +28,15 @@ public class SystemMenuController {
             return new Result(false, MessageConstant.GET_SYS_MENU_FAIL);
         }
     }
+    @GetMapping("/default")
+    public Result defaultPage() {
+        try {
+            String defaultPage = systemMenuService.getDefault();
+            return new Result(true, MessageConstant.GET_DEFAULT_PAGE_SUCCESS, defaultPage);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new Result(false, MessageConstant.GET_DEFAULT_PAGE_FAIL);
+        }
+    }
 
 }

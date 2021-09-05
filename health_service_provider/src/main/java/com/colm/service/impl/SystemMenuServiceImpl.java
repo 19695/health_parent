@@ -1,6 +1,7 @@
 package com.colm.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.colm.dao.DataDictDao;
 import com.colm.dao.SystemMenuDao;
 import com.colm.pojo.Menu;
 import com.colm.service.SystemMenuService;
@@ -18,6 +19,9 @@ public class SystemMenuServiceImpl implements SystemMenuService {
     @Autowired
     private SystemMenuDao systemMenuDao;
 
+    @Autowired
+    private DataDictDao dataDictDao;
+
     @Override
     public List<Menu> getAll() {
         List<Menu> all = systemMenuDao.getAll();
@@ -33,5 +37,10 @@ public class SystemMenuServiceImpl implements SystemMenuService {
             e.setChildren(listMap.get(e.getId()));
         });
         return parentList;
+    }
+
+    @Override
+    public String getDefault() {
+        return dataDictDao.getDefaultPage();
     }
 }
