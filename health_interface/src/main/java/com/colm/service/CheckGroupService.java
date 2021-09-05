@@ -12,4 +12,6 @@ public interface CheckGroupService {
     CheckGroup findById(Integer groupId);
     List<Integer> findCheckItemIdsByCheckGroupId(String groupId);
     Result add(List<Integer> itemIds, CheckGroup checkGroup);
+    Result edit(List<Integer> itemIds, CheckGroup checkGroup);
+    Result delete(Integer id);
 }

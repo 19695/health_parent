@@ -28,6 +28,26 @@ public class CheckGroupController {
         }
     }
 
+    @PostMapping("/edit")
+    public Result edit(@RequestParam("checkItemIds") List<Integer> itemIds, @RequestBody CheckGroup checkGroup) {
+        try {
+            return checkGroupService.edit(itemIds, checkGroup);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, MessageConstant.EDIT_CHECKGROUP_FAIL);
+        }
+    }
+
+    @GetMapping("/delete")
+    public Result delete(Integer id) {
+        try {
+            return checkGroupService.delete(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, MessageConstant.DELETE_CHECKGROUP_FAIL);
+        }
+    }
+
     @PostMapping("/findPage")
     public PageResult findPage(@RequestBody QueryPageBean queryPageBean) {
         return checkGroupService.pageQuery(queryPageBean);

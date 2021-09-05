@@ -442,3 +442,27 @@ A：默认会返回插入的记录数，也可以通过不同的手段使得除�
 
 ### mybatis 批量 insert
 
+```xml
+<insert id="setCheckGroupAssociateCheckItems">
+    insert into t_checkgroup_checkitem(checkgroup_id, checkitem_id) values
+    <foreach collection="itemIds" separator="," item="id">
+        (#{groupId}, #{id})
+    </foreach>
+</insert>
+```
+
+
+
+### mybatis 模糊查询（注意数据库类型）
+
+```xml
+<select id="findByCondition" resultType="com.colm.pojo.CheckGroup">
+    select * from t_checkgroup
+    <if test="value != null and value != '' and value.length > 0">
+        where code like concat('%', #{value}, '%')
+        or name like concat('%', #{value}, '%')
+        or helpCode like concat('%', #{value}, '%')
+    </if>
+</select>
+```
+

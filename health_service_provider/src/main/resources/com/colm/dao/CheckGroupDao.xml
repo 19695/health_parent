@@ -2,10 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.colm.dao.CheckGroupDao">
+
    <select id="findByCondition" resultType="com.colm.pojo.CheckGroup">
         select * from t_checkgroup
        <if test="value != null and value != '' and value.length > 0">
-           where code = #{value} or name = #{value} or helpCode = #{value}
+            where code like concat('%', #{value}, '%')
+            or name like concat('%', #{value}, '%')
+            or helpCode like concat('%', #{value}, '%')
        </if>
    </select>
 
@@ -33,5 +36,39 @@
             (#{groupId}, #{id})
         </foreach>
     </insert>
+
+    <delete id="delete">
+        <!-- 删除检查组的时候不必做限制 -->
+        delete from t_checkgroup where id = #{id} <!-- and 0 = (select count(1) from t_checkgroup_checkitem where checkgroup_id = #{id}) -->
+    </delete>
+
+    <update id="edit">
+        update t_checkgroup
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="code != null">
+                code = #{code},
+            </if>
+            <if test="helpCode != null">
+                helpCode = #{helpCode},
+            </if>
+            <if test="attention != null">
+                attention = #{attention},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteAssocication" parameterType="int">
+        delete from t_checkgroup_checkitem where checkgroup_id = #{id}
+    </delete>
 
 </mapper>

@@ -277,6 +277,9 @@
                 },
                 //分页查询
                 findPage() {
+                    if(this.pagination.queryString) {
+                        this.pagination.currentPage = 1;
+                    }
                     //发送ajax请求，提交分页相关请求参数（页码、每页显示记录数、查询条件）
                     var param = {
                         currentPage:this.pagination.currentPage,
