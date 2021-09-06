@@ -68,4 +68,6 @@ public class MessageConstant {
     public static final String GET_SYS_MENU_SUCCESS = "获取系统菜单成功";
     public static final String GET_DEFAULT_PAGE_SUCCESS = "获取默认主页成功";
     public static final String GET_DEFAULT_PAGE_FAIL = "获取默认主页失败";
+    public static final String GET_OSS_DOMAIN_SUCCESS = "获取附件存储地址成功";
+    public static final String GET_OSS_DOMAIN_FAIL = "获取附件存储地址失败";
 }

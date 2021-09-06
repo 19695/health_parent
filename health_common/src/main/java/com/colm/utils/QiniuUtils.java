@@ -9,6 +9,9 @@ import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -17,11 +20,21 @@ import java.io.InputStream;
  * 七牛云工具类
  */
 public class QiniuUtils {
-    public  static String accessKey = "";
-    public  static String secretKey = "";
-    public  static String bucket = "";
+
+    private static Logger logger = LoggerFactory.getLogger(QiniuUtils.class);
+
+    public  static String accessKey = "SQkcWX0KE4Hwh9efBkmDN4VRWqN0cisakr65LfhD";
+    public  static String secretKey = "GEqUFLoHi-XEU9LbfHWeYdjwcowHdM9F2rpH2edx";
+    public  static String bucket = "colm-health";
+
+//    public static void main(String[] args) {
+//        File file = new File("E:\\OriginalDirectory\\Pictures\\Screenshots\\TranslucentTB.png");
+//        String filePath = "E:\\OriginalDirectory\\Pictures\\Screenshots\\TranslucentTB.png";
+//        upload2Qiniu(filePath, "test.png");
+//    }
 
     public static void upload2Qiniu(String filePath,String fileName){
+
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(Zone.zone0());
         UploadManager uploadManager = new UploadManager(cfg);
@@ -31,10 +44,12 @@ public class QiniuUtils {
             Response response = uploadManager.put(filePath, fileName, upToken);
             //解析上传成功的结果
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+            logger.info("QiNiu Object Storage Service save success : {}", putRet);
         } catch (QiniuException ex) {
             Response r = ex.response;
             try {
-                System.err.println(r.bodyString());
+//                System.err.println(r.bodyString());
+                logger.info("QiNiu Object Storage Service save failure : {}", r.bodyString());
             } catch (QiniuException ex2) {
                 //ignore
             }
@@ -56,13 +71,16 @@ public class QiniuUtils {
             Response response = uploadManager.put(bytes, key, upToken);
             //解析上传成功的结果
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
+            logger.info("QiNiu Object Storage Service save success : {}", putRet);
             System.out.println(putRet.key);
             System.out.println(putRet.hash);
         } catch (QiniuException ex) {
             Response r = ex.response;
             System.err.println(r.toString());
+            logger.info("QiNiu Object Storage Service save failure : {}", r.toString());
             try {
                 System.err.println(r.bodyString());
+                logger.info("QiNiu Object Storage Service save failure : {}", r.bodyString());
             } catch (QiniuException ex2) {
                 //ignore
             }

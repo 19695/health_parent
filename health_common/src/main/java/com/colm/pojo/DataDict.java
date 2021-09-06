@@ -1,6 +1,8 @@
 package com.colm.pojo;
 
-public class DataDict {
+import java.io.Serializable;
+
+public class DataDict implements Serializable {
     private Integer id;
     private String type;
     private String code;

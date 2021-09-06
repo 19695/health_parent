@@ -370,6 +370,68 @@ public Result findCheckItemIdsByCheckGroupId(@RequestParam("id") String groupId)
 
 
 
+### dubbo 序列化问题
+
+完整日志
+
+```
+00:19:48,703 DEBUG getByTypeAndCode:159 - ==>  Preparing: select * from t_datadict where `type` = ? and code = ? 
+00:19:48,704 DEBUG getByTypeAndCode:159 - ==> Parameters: 01(String), 0001(String)
+00:19:48,718 DEBUG getByTypeAndCode:159 - <==      Total: 1
+00:19:48,718 DEBUG SqlSessionUtils:186 - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@37f37334]
+00:19:48,718 DEBUG SqlSessionUtils:284 - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@37f37334]
+00:19:48,719 DEBUG SqlSessionUtils:310 - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@37f37334]
+00:19:48,719 DEBUG SqlSessionUtils:315 - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@37f37334]
+00:19:48,719 DEBUG DataSourceTransactionManager:743 - Initiating transaction commit
+00:19:48,719 DEBUG DataSourceTransactionManager:326 - Committing JDBC transaction on Connection [com.mysql.jdbc.JDBC4Connection@6b40b349]
+00:19:48,757 DEBUG DataSourceTransactionManager:384 - Releasing JDBC Connection [com.mysql.jdbc.JDBC4Connection@6b40b349] after transaction
+00:19:48,757 DEBUG DataSourceUtils:340 - Returning JDBC Connection to DataSource
+00:19:48,758  WARN ExchangeCodec:310 -  [DUBBO] Fail to encode response: Response [id=19, version=2.0.0, status=20, event=false, error=null, result=RpcResult [result=DataDict{id=1, type='01', code='0001', value='setmeal.html'}, exception=null]], send bad_response info instead, cause: Serialized class com.colm.pojo.DataDict must implement java.io.Serializable, dubbo version: 2.6.0, current host: 127.0.0.1
+java.lang.IllegalStateException: Serialized class com.colm.pojo.DataDict must implement java.io.Serializable
+	at com.alibaba.com.caucho.hessian.io.SerializerFactory.getDefaultSerializer(SerializerFactory.java:400)
+	at com.alibaba.com.caucho.hessian.io.SerializerFactory.getSerializer(SerializerFactory.java:374)
+	at com.alibaba.com.caucho.hessian.io.Hessian2Output.writeObject(Hessian2Output.java:381)
+	at com.alibaba.dubbo.common.serialize.support.hessian.Hessian2ObjectOutput.writeObject(Hessian2ObjectOutput.java:77)
+	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.encodeResponseData(DubboCodec.java:191)
+	at com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec.encodeResponse(ExchangeCodec.java:274)
+	at com.alibaba.dubbo.remoting.exchange.codec.ExchangeCodec.encode(ExchangeCodec.java:72)
+	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboCountCodec.encode(DubboCountCodec.java:37)
+	at com.alibaba.dubbo.remoting.transport.netty.NettyCodecAdapter$InternalEncoder.encode(NettyCodecAdapter.java:80)
+	at org.jboss.netty.handler.codec.oneone.OneToOneEncoder.handleDownstream(OneToOneEncoder.java:66)
+	at org.jboss.netty.channel.DefaultChannelPipeline.sendDownstream(DefaultChannelPipeline.java:591)
+	at org.jboss.netty.channel.DefaultChannelPipeline$DefaultChannelHandlerContext.sendDownstream(DefaultChannelPipeline.java:776)
+	at org.jboss.netty.channel.SimpleChannelHandler.writeRequested(SimpleChannelHandler.java:304)
+	at com.alibaba.dubbo.remoting.transport.netty.NettyHandler.writeRequested(NettyHandler.java:98)
+	at org.jboss.netty.channel.SimpleChannelHandler.handleDownstream(SimpleChannelHandler.java:266)
+	at org.jboss.netty.channel.DefaultChannelPipeline.sendDownstream(DefaultChannelPipeline.java:591)
+	at org.jboss.netty.channel.DefaultChannelPipeline.sendDownstream(DefaultChannelPipeline.java:582)
+	at org.jboss.netty.channel.Channels.write(Channels.java:611)
+	at org.jboss.netty.channel.Channels.write(Channels.java:578)
+	at org.jboss.netty.channel.AbstractChannel.write(AbstractChannel.java:251)
+	at com.alibaba.dubbo.remoting.transport.netty.NettyChannel.send(NettyChannel.java:96)
+	at com.alibaba.dubbo.remoting.transport.AbstractPeer.send(AbstractPeer.java:52)
+	at com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeHandler.received(HeaderExchangeHandler.java:169)
+	at com.alibaba.dubbo.remoting.transport.DecodeHandler.received(DecodeHandler.java:50)
+	at com.alibaba.dubbo.remoting.transport.dispatcher.ChannelEventRunnable.run(ChannelEventRunnable.java:79)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:630)
+	at java.base/java.lang.Thread.run(Thread.java:832)
+
+```
+
+核心问题日志
+
+```
+00:19:48,758  WARN ExchangeCodec:310 -  [DUBBO] Fail to encode response: Response [id=19, version=2.0.0, status=20, event=false, error=null, result=RpcResult [result=DataDict{id=1, type='01', code='0001', value='setmeal.html'}, exception=null]], send bad_response info instead, cause: Serialized class com.colm.pojo.DataDict must implement java.io.Serializable, dubbo version: 2.6.0, current host: 127.0.0.1
+java.lang.IllegalStateException: Serialized class com.colm.pojo.DataDict must implement java.io.Serializable
+```
+
+可以看出 dubbo 要求传输的数据必须实现序列化
+
+
+
+
+
 ## 知识记录
 
 ### mybaits insert
