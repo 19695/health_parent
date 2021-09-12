@@ -2,6 +2,58 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.colm.dao.CheckGroupDao">
+    <resultMap id="baseResultMap" type="com.colm.pojo.CheckGroup">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="helpCode" property="helpCode"/>
+        <result column="sex" property="sex"/>
+        <result column="remark" property="remark"/>
+        <result column="attention" property="attention"/>
+    </resultMap>
+
+    <!--
+        查询检查组对应的检查项
+        检查组与检查项为 n:n
+    -->
+    <resultMap id="findByIdResultMap" type="com.colm.pojo.CheckGroup" extends="baseResultMap">
+        <collection property="checkItems" ofType="com.colm.pojo.CheckItem" column="id"
+                    select="com.colm.dao.CheckItemDao.findItemsByGroupId"></collection>
+    </resultMap>
+
+    <!--
+        根据套餐 id 查询关联的检查组集合
+    -->
+    <select id="findGroupsBySetmealId" resultMap="findByIdResultMap">
+        select * from t_checkgroup where id in (
+            select checkgroup_id from t_setmeal_checkgroup where setmeal_id = #{setmealId}
+        )
+    </select>
+
+    <!--
+        插入时返回主键
+    -->
+    <insert id="add" parameterType="com.colm.pojo.CheckGroup">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_checkgroup(code,name,sex,helpCode,remark,attention)
+        values(#{code}, #{name}, #{sex}, #{helpCode}, #{remark}, #{attention})
+    </insert>
+
+    <!--
+        批量插入
+    -->
+    <insert id="setCheckGroupAssociateCheckItems">
+        insert into t_checkgroup_checkitem(checkgroup_id, checkitem_id) values
+        <foreach collection="itemIds" separator="," item="id">
+            (#{groupId}, #{id})
+        </foreach>
+    </insert>
+
+    <select id="findAll" resultType="com.colm.pojo.CheckGroup">
+        select * from t_checkgroup
+    </select>
 
    <select id="findByCondition" resultType="com.colm.pojo.CheckGroup">
         select * from t_checkgroup
@@ -22,24 +74,10 @@
         select checkitem_id from t_checkgroup_checkitem where checkgroup_id = #{groupId}
     </select>
 
-    <insert id="add" parameterType="com.colm.pojo.CheckGroup">
-        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
-            select LAST_INSERT_ID()
-        </selectKey>
-        insert into t_checkgroup(code,name,sex,helpCode,remark,attention)
-        values(#{code}, #{name}, #{sex}, #{helpCode}, #{remark}, #{attention})
-    </insert>
-
-    <insert id="setCheckGroupAssociateCheckItems">
-        insert into t_checkgroup_checkitem(checkgroup_id, checkitem_id) values
-        <foreach collection="itemIds" separator="," item="id">
-            (#{groupId}, #{id})
-        </foreach>
-    </insert>
-
     <delete id="delete">
         <!-- 删除检查组的时候不必做限制 -->
-        delete from t_checkgroup where id = #{id} <!-- and 0 = (select count(1) from t_checkgroup_checkitem where checkgroup_id = #{id}) -->
+        delete from t_checkgroup where id = #{id}
+        <!-- and 0 = (select count(1) from t_checkgroup_checkitem where checkgroup_id = #{id}) -->
     </delete>
 
     <update id="edit">

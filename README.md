@@ -434,7 +434,7 @@ java.lang.IllegalStateException: Serialized class com.colm.pojo.DataDict must im
 
 ## 知识记录
 
-### mybaits insert
+### mybaits insert 获取主键
 
 Q：执行 insert 之后的返回值？
 
@@ -504,6 +504,13 @@ A：默认会返回插入的记录数，也可以通过不同的手段使得除�
 
 ### mybatis 批量 insert
 
+方式一
+
+```java
+int setCheckGroupAssociateCheckItems(@Param("groupId") int groupId, 
+                                     @Param("itemIds") List<Integer> itemIds);
+```
+
 ```xml
 <insert id="setCheckGroupAssociateCheckItems">
     insert into t_checkgroup_checkitem(checkgroup_id, checkitem_id) values
@@ -512,6 +519,25 @@ A：默认会返回插入的记录数，也可以通过不同的手段使得除�
     </foreach>
 </insert>
 ```
+
+方式二
+
+```java
+void setSetmealAssociateGroup(Map<String, Object> map);
+```
+
+```xml
+<insert id="setSetmealAssociateGroup" parameterType="map">
+    insert into t_setmeal_checkgroup(setmeal_id, checkgroup_id) values
+    <foreach collection="checkgroupIds" separator="," item="item">
+        (#{setmealId}, #{item})
+    </foreach>
+</insert>
+```
+
+>  insert into t_setmeal_checkgroup(setmeal_id, checkgroup_id) values (?, ?) , (?, ?) , (?, ?) 
+> Parameters: 17(Integer), 5(Integer), 17(Integer), 7(Integer), 17(Integer), 8(Integer)
+> Updates: 3
 
 
 
@@ -525,6 +551,124 @@ A：默认会返回插入的记录数，也可以通过不同的手段使得除�
         or name like concat('%', #{value}, '%')
         or helpCode like concat('%', #{value}, '%')
     </if>
+</select>
+```
+
+
+
+### Spring 加载配置文件
+
+有三种方式
+
+* 通过 xml 加载 properties 文件
+* 通过注解加载 properties 文件
+* 通过 @PropertySource 和 @Value 来读取配置文件
+
+详情参考： https://www.cnblogs.com/lyjing/p/8406827.html
+
+
+
+### elementui 图片上传组件
+
+（1）定义模型数据，用于后面上传文件的图片预览：
+
+```javascript
+imageUrl:null,//模型数据，用于上传图片完成后图片预览
+```
+
+（2）定义上传组件：
+
+```html
+<!--
+  el-upload：上传组件
+  action：上传的提交地址
+  auto-upload：选中文件后是否自动上传
+  name：上传文件的名称，服务端可以根据名称获得上传的文件对象
+  show-file-list：是否显示已上传文件列表
+  on-success：文件上传成功时的钩子
+  before-upload：上传文件之前的钩子
+-->
+<el-upload
+           class="avatar-uploader"
+           action="/setmeal/upload.do"
+           :auto-upload="autoUpload"
+           name="imgFile"
+           :show-file-list="false"
+           :on-success="handleAvatarSuccess"
+           :before-upload="beforeAvatarUpload">
+  <!--用于上传图片预览-->
+  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+  <!--用于展示上传图标-->
+  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+</el-upload>
+```
+
+（3）定义对应的钩子函数：
+
+```javascript
+//文件上传成功后的钩子，response为服务端返回的值，file为当前上传的文件封装成的js对象
+handleAvatarSuccess(response, file) {
+  this.imageUrl = "http://pqjroc654.bkt.clouddn.com/"+response.data;
+  this.$message({
+    message: response.message,
+    type: response.flag ? 'success' : 'error'
+  });
+  //设置模型数据（图片名称），后续提交ajax请求时会提交到后台最终保存到数据库
+  this.formData.img = response.data;
+}
+
+//上传文件之前的钩子
+beforeAvatarUpload(file) {
+  const isJPG = file.type === 'image/jpeg';
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isJPG) {
+    this.$message.error('上传套餐图片只能是 JPG 格式!');
+  }
+  if (!isLt2M) {
+    this.$message.error('上传套餐图片大小不能超过 2MB!');
+  }
+  return isJPG && isLt2M;
+}
+```
+
+
+
+### 多对多映射
+
+[参考之前写过的示例](https://github.com/atguigu-learning/atcrowdfunding07-member-parent/blob/master/atcrowdfunding10-member-mysql-provider/src/main/resources/mybatis/mapper/ProjectPOMapper.xml)
+
+三级关联
+
+`SetmealDao.xml`
+
+```xml
+<resultMap id="findByIdResultMap" type="com.colm.pojo.Setmeal" extends="baseResultMap">
+    <!-- 多对多映射 -->
+    <collection property="checkGroups" ofType="com.colm.pojo.CheckGroup" column="id"
+                select="com.colm.dao.CheckGroupDao.findGroupsBySetmealId"></collection>
+</resultMap>
+```
+
+`CheckGroupDao.xml`
+
+```xml
+<resultMap id="findByIdResultMap" type="com.colm.pojo.CheckGroup" extends="baseResultMap">
+    <collection property="checkItems" ofType="com.colm.pojo.CheckItem" column="id"
+                select="com.colm.dao.CheckItemDao.findItemsByGroupId"></collection>
+</resultMap>
+<select id="findGroupsBySetmealId" resultMap="findByIdResultMap">
+    select * from t_checkgroup where id in (
+    select checkgroup_id from t_setmeal_checkgroup where setmeal_id = #{setmealId}
+    )
+</select>
+```
+
+`CheckItemDao.xml`
+
+```xml
+<select id="findItemsByGroupId" parameterType="int" resultType="com.colm.pojo.CheckItem">
+    select * from t_checkitem
+    where id in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id})
 </select>
 ```
 

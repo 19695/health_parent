@@ -269,6 +269,8 @@
                        type: response.flag ? 'success' : 'error',
                        message: response.message
                     });
+                    //设置模型数据（图片名称），后续提交ajax请求时会提交到后台最终保存到数据库
+                    this.formData.img = response.data;
                 },
                 //上传图片之前执行
                 beforeAvatarUpload(file) {

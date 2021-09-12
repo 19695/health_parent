@@ -94,4 +94,9 @@ public class CheckGroupServiceImpl implements CheckGroupService {
         return new Result(false, MessageConstant.DELETE_CHECKGROUP_FAIL);
     }
 
+    @Override
+    public List<CheckGroup> findAll() {
+        return  checkGroupDao.findAll();
+    }
+
 }

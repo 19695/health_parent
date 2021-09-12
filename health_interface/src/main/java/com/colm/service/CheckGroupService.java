@@ -14,4 +14,5 @@ public interface CheckGroupService {
     Result add(List<Integer> itemIds, CheckGroup checkGroup);
     Result edit(List<Integer> itemIds, CheckGroup checkGroup);
     Result delete(Integer id);
+    List<CheckGroup> findAll();
 }

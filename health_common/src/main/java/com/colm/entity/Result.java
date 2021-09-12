@@ -26,8 +26,11 @@ public class Result implements Serializable{
     private static Result success() {
         return new Result(true, "");
     }
+    private static Result failure(String msg) {
+        return new Result(false, msg);
+    }
     private static Result failure() {
-        return new Result(false, "");
+        return failure("");
     }
 
     public boolean isFlag() {

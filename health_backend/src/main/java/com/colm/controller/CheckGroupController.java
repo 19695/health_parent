@@ -18,6 +18,16 @@ public class CheckGroupController {
     @Reference
     private CheckGroupService checkGroupService;
 
+    @GetMapping("/findAll")
+    public Result findAll() {
+        try {
+            List<CheckGroup> result = checkGroupService.findAll();
+            return new Result(true, MessageConstant.QUERY_CHECKGROUP_SUCCESS, result);
+        } catch (Exception e) {
+            return Result.FAILURE;
+        }
+    }
+
     @PostMapping("/add")
     public Result add(@RequestParam("checkItemIds") List<Integer> itemIds, @RequestBody CheckGroup checkGroup) {
         try {

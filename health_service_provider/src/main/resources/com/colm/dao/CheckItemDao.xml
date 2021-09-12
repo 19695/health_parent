@@ -2,6 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.colm.dao.CheckItemDao">
+
+    <!--
+        根据检查组ID查询关联的检查项
+    -->
+    <select id="findItemsByGroupId" parameterType="int" resultType="com.colm.pojo.CheckItem">
+        select * from t_checkitem
+        where id in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id})
+    </select>
+
     <!--插入检查项数据-->
     <insert id="add" parameterType="com.colm.pojo.CheckItem">
         insert into t_checkitem(code,name,sex,age,price,type,remark,attention)
@@ -64,10 +73,4 @@
         select * from t_checkitem
     </select>
 
-    <!--根据检查组ID查询关联的检查项-->
-    <select id="findCheckItemById" parameterType="int" resultType="com.colm.pojo.CheckItem">
-        select * from t_checkitem
-        where id
-  	    in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id})
-    </select>
 </mapper>
