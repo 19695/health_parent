@@ -3,18 +3,19 @@ package com.colm.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.colm.constant.DateFormatEnum;
 import com.colm.constant.MessageConstant;
-import com.colm.entity.PageResult;
+import com.colm.constant.RedisConstant;
 import com.colm.entity.Result;
 import com.colm.pojo.Setmeal;
 import com.colm.service.SetmealService;
 import com.colm.utils.QiniuUtils;
 import com.colm.utils.TimeFormatUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,6 +24,9 @@ public class SetmealController {
 
     @Reference
     private SetmealService setmealService;
+
+    @Autowired
+    private JedisPool jedisPool;
 
     @PostMapping("/upload")
     public Result upload(@RequestParam("imgFile") MultipartFile file) {
@@ -38,6 +42,8 @@ public class SetmealController {
         String storeName = formatTime + subUuid + fileType;
         try {
             QiniuUtils.upload2Qiniu(file.getBytes(), storeName);
+            // redis
+            jedisPool.getResource().sadd(RedisConstant.SETMEAL_PIC_RESOURCES, storeName);
         } catch (IOException e) {
             e.printStackTrace();
             return new Result(false, MessageConstant.PIC_UPLOAD_FAIL);

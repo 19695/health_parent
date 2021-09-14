@@ -430,6 +430,12 @@ java.lang.IllegalStateException: Serialized class com.colm.pojo.DataDict must im
 
 
 
+### RDM 连接阿里云 Redis 问题
+
+踩坑经过：我在阿里云 redis 除了默认的账号外我还新增了一个用于 java 开发的账号，win 端 RDM 连接的时候想要用 java 用户，于是我把连接信息都写上了包括 用户名 密码，然后就怎么都不通，怀疑过白名单配置不对，白名单没有及时生效，最后本地起虚机利用 redis-cli 测试，发现只可以使用默认账户登录，且在 RDM 配置连接信息的时候不需要指定用户名
+
+![image-20210915000912825](imgs/image-20210915000912825.png)
+
 
 
 ## 知识记录
@@ -671,4 +677,25 @@ beforeAvatarUpload(file) {
     where id in (select checkitem_id from t_checkgroup_checkitem where checkgroup_id=#{id})
 </select>
 ```
+
+
+
+### jedisPoolConfig
+
+Jedis连接就是连接池中JedisPool管理的资源，JedisPool保证资源在一个可控范围内，并且保障线程安全。使用合理的GenericObjectPoolConfig配置能够提升Redis的服务性能，降低资源开销。下列两表将对一些重要参数进行说明，并提供设置建议。
+
+![image-20210914231116841](imgs/image-20210914231116841.png)
+
+
+
+
+空闲Jedis对象检测由下列四个参数组合完成，testWhileIdle是该功能的开关。
+
+![image-20210914231317071](imgs/image-20210914231317071.png)
+
+> maxIdle实际上才是业务需要的最大连接数，maxTotal 是为了给出余量，所以 maxIdle 不要设置得过小，否则会有new Jedis（新连接）开销，而minIdle是为了控制空闲资源检测。
+>
+> 连接池的最佳性能是maxTotal=maxIdle，这样就避免了连接池伸缩带来的性能干扰。但如果并发量不大或者maxTotal设置过高，则会导致不必要的连接资源浪费。
+
+参考：https://blog.csdn.net/u010648555/article/details/103858684
 
