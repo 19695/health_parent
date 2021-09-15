@@ -4,6 +4,8 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.colm.constant.DateFormatEnum;
 import com.colm.constant.MessageConstant;
 import com.colm.constant.RedisConstant;
+import com.colm.entity.PageResult;
+import com.colm.entity.QueryPageBean;
 import com.colm.entity.Result;
 import com.colm.pojo.Setmeal;
 import com.colm.service.SetmealService;
@@ -27,6 +29,11 @@ public class SetmealController {
 
     @Autowired
     private JedisPool jedisPool;
+
+    @PostMapping("/findPage")
+    public PageResult findPage(@RequestBody QueryPageBean queryPageBean) {
+        return setmealService.findPage(queryPageBean);
+    }
 
     @PostMapping("/upload")
     public Result upload(@RequestParam("imgFile") MultipartFile file) {

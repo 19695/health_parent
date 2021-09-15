@@ -82,21 +82,21 @@
                         <el-button type="primary" class="butT" @click="handleCreate()">新建</el-button>
                     </div>
                     <el-table size="small" current-row-key="id" :data="dataList" stripe highlight-current-row>
-                        <el-table-column type="index" align="center" label="序号"></el-table-column>
-                        <el-table-column prop="code" label="套餐编码" align="center"></el-table-column>
-                        <el-table-column prop="name" label="套餐名称" align="center"></el-table-column>
-                        <el-table-column label="适用性别" align="center">
+                        <el-table-column type="index" align="center" label="序号" width="50px"></el-table-column>
+                        <el-table-column prop="code" label="套餐编码" align="center" width="70px"></el-table-column>
+                        <el-table-column prop="name" label="套餐名称" align="center" width="176px"></el-table-column>
+                        <el-table-column label="适用性别" align="center" width="80px">
                             <template slot-scope="scope">
                                 <span>{{ scope.row.sex == '0' ? '不限' : scope.row.sex == '1' ? '男' : '女'}}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="age" label="适用年龄" align="center"></el-table-column>
-                        <el-table-column prop="helpCode" label="助记码" align="center"></el-table-column>
+                        <el-table-column prop="age" label="适用年龄" align="center" width="80px"></el-table-column>
+                        <el-table-column prop="helpCode" label="助记码" align="center" width="90px"></el-table-column>
                         <el-table-column prop="remark" label="说明" align="center"></el-table-column>
-                        <el-table-column label="操作" align="center">
+                        <el-table-column label="操作" align="center" width="150px">
                             <template slot-scope="scope">
-                                <el-button type="primary" size="mini">编辑</el-button>
-                                <el-button size="mini" type="danger">删除</el-button>
+                                <el-button type="primary" size="mini" @click="notice()">编辑</el-button>
+                                <el-button size="mini" type="danger" @click="notice()">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -248,7 +248,7 @@
                 ossDomain: ''
             },
             created() {
-                // this.findPage();
+                this.findPage();
                 axios.get("/sysdata/getOssDomain.do").then((res) => {
                     if(res.data.flag) {
                         this.ossDomain = res.data.data;
@@ -346,6 +346,15 @@
                 handleCurrentChange(currentPage) {
                     this.pagination.currentPage = currentPage;
                     this.findPage();
+                },
+                notice() {
+                    this.$confirm("不想写", "🤦‍♂", {
+                        type: 'warning'
+                    }).then(() => {
+                        this.$message.info("简单删改,略...");
+                    }).catch(() => {
+                        this.$message.info("简单删改,略...");
+                    });
                 }
             }
         })

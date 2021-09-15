@@ -3,8 +3,12 @@ package com.colm.service.impl;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.colm.constant.RedisConstant;
 import com.colm.dao.SetmealDao;
+import com.colm.entity.PageResult;
+import com.colm.entity.QueryPageBean;
 import com.colm.pojo.Setmeal;
 import com.colm.service.SetmealService;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisPool;
@@ -33,7 +37,17 @@ public class SetmealServiceImpl implements SetmealService {
             setmealDao.setSetmealAssociateGroup(map);
         }
 
-        // todo 文件名做 redis 缓存
+        // 落库的图片
         jedisPool.getResource().sadd(RedisConstant.SETMEAL_PIC_DB_RESOURCES, setmeal.getImg());
+    }
+
+    @Override
+    public PageResult findPage(QueryPageBean queryPageBean) {
+        Integer pageSize = queryPageBean.getPageSize();
+        Integer currentPage = queryPageBean.getCurrentPage();
+        String queryString = queryPageBean.getQueryString();
+        PageHelper.startPage(currentPage, pageSize);
+        Page<Setmeal> page = setmealDao.findByCondition(queryString);
+        return new PageResult(page.getTotal(), page.getResult());
     }
 }
