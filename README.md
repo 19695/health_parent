@@ -24,7 +24,7 @@
 
 应用服务器采用基于 maven 插件形式的嵌入式 tomcat 容器
 
-缓存中间件采用aliyun redis
+缓存中间件采用 redis
 
 文件存储采用七牛云存储
 
@@ -435,6 +435,61 @@ java.lang.IllegalStateException: Serialized class com.colm.pojo.DataDict must im
 踩坑经过：我在阿里云 redis 除了默认的账号外我还新增了一个用于 java 开发的账号，win 端 RDM 连接的时候想要用 java 用户，于是我把连接信息都写上了包括 用户名 密码，然后就怎么都不通，怀疑过白名单配置不对，白名单没有及时生效，最后本地起虚机利用 redis-cli 测试，发现只可以使用默认账户登录，且在 RDM 配置连接信息的时候不需要指定用户名
 
 ![image-20210915000912825](imgs/image-20210915000912825.png)
+
+
+
+### ! [rejected]  master -> master (non-fast-forward)
+
+```shell
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git push origin master
+To github.com:19695/health_parent.git
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'github.com:19695/health_parent.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git pull
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details.
+
+    git pull <remote> <branch>
+
+If you wish to set tracking information for this branch you can do so with:
+
+    git branch --set-upstream-to=origin/<branch> master
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git pull origin master
+From github.com:19695/health_parent
+ * branch            master     -> FETCH_HEAD
+error: Your local changes to the following files would be overwritten by merge:
+        README.md
+Please commit your changes or stash them before you merge.
+Aborting
+
+Colm@SURFACE-BOOK3 MINGW64 /e/Workspaces/IdeaProjects/health_parent (master)
+$ git branch --set-upstream-to=origin/master master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+```
+
+然后 merge 远程即可
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
