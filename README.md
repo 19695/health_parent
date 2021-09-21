@@ -24,7 +24,7 @@
 
 应用服务器采用基于 maven 插件形式的嵌入式 tomcat 容器
 
-缓存中间件采用 redis
+缓存中间件采用aliyun redis
 
 文件存储采用七牛云存储
 
