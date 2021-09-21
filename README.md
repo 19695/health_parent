@@ -699,3 +699,104 @@ Jedis连接就是连接池中JedisPool管理的资源，JedisPool保证资源在
 
 参考：https://blog.csdn.net/u010648555/article/details/103858684
 
+
+
+### MultipartFile 与 File
+
+参考：
+
+1. [MultipartFile与File的一些事](https://blog.csdn.net/sdut406/article/details/85647982)
+2. [SpringBoot：关于MultipartFile和File不得不说的那些事](https://www.jianshu.com/p/520b1e292c52)
+3. [深入理解MultipartFile，以更优雅的方式处理文件](https://blog.csdn.net/qq_36314960/article/details/104775557)
+
+网上的资料没说透啊，自己看下吧
+
+> 简单来说 MultipartFile 不是 File 的子类，它内部间接利用了 File 来 “持有” 文件
+
+首先 MultipartFile 是 spring 的 org.springframework.web.multipart 包下的一个接口，该接口继承自 InputStreamSource
+
+![image-20210921234054669](imgs/image-20210921234054669.png)
+
+而他的实现类分别在 spring-web 和 spring-test 包下有找到
+
+![image-20210921234219606](imgs/image-20210921234219606.png)
+
+那就看下 CommonsMultipartFile 吧，这名一看就是责任重大
+
+![image-20210921235516110](imgs/image-20210921235516110.png)
+
+这里重点肯定是 FileItem 了（by the way 它的 log 使用的 spring-jcl）
+
+这回是个老朋友了，刚开始学习 java web 和 spring 的时候就接触的 commons-fileupload，虽说接触早但是没研究过
+
+![image-20210922000208567](imgs/image-20210922000208567.png)
+
+可以看到它有两个实现类，可以看到 DefaultFileItem 已经弃用了，点进去的更是发现了它的巧妙之处，它完全的弃用了但是却保留了对曾经依赖它的第三方调用的支持
+
+![image-20210922000435495](imgs/image-20210922000435495.png)
+
+回到 DiskFileItem 简单的看下如何存储的文件，具体的可以看源码
+
+![image-20210922002453437](imgs/image-20210922002453437.png)
+
+仅仅是看 MultipartFile，如果想了解更多需要看 spring mvc 是怎么处理 MultipartFile 和 MultipartHttpServletRequest，深入了解可以看下前后端是如何处理的
+
+参考：
+
+1. [SpringMVC 处理multipart形式的数据](https://blog.csdn.net/qq_37598011/article/details/80796477)
+2. [Spring 梳理-处理Multipart 请求](https://www.cnblogs.com/jiangtao1218/p/9813232.html)
+
+
+
+### try-with-resources
+
+原因是我在看到上面的问题示例代码中使用了 `try(...){...}catch(...){...}` 这是第一次遇到就搜索了一下
+
+之前我们进行资源的释放都是在 `try-catch-finally` 语句块进行处理的
+
+```java
+InputStream in = null;
+try{
+	in = new FileInputStream(file);
+}catch(Exception e){
+	e.printStackTrace();
+}finally{
+	if(null != null){
+        in.close;
+    }
+}
+```
+
+到了 jdk1.7 之后我们可以使用 `try-with-resources` 来处理
+
+```java
+try (InputStream in = new FileInputStream(file)) {
+  
+}catch(Exception e){
+	e.printStackTrace();
+}
+```
+
+> 这种写法会在try语句结束后自动释放，前提是这些可关闭的资源必须实现 java.lang.AutoCloseable 接口。
+> 此时，就不用再finally中进行资源的释放了。
+>
+> 这是 jdk1.7 加入的 try-with-resources 写法，可以用来代替之前的 try-catch-finally 语句块，实现对某些资源开销大的 resource 省去写 finally 语句块释放资源的代码
+>
+> 例如：关闭流、断开数据库连接等等，都不在需要写 finally 语句块释放资源，try-with-resources 会自动释放 try 后面 () 内占用的资源
+
+
+
+### idea 编译器的骚操作之 ≠
+
+原因同样是因为我在研究 MultipartFile，具体是我在看它的实现类源码的时候发现如下
+
+![image-20210921235006274](imgs/image-20210921235006274.png)
+
+> if (pos ≠ -1)  {
+
+我原本以为这是 jdk 什么版本开始的新特性，然后百度：这是 **Reader Mode** 下的 **Font ligatures** 默认勾选的效果
+
+> 路径：Preferences > Editor > Reader Mode > Font ligatures
+
+参考：[卧槽！Java 中的 xx ≠ null 是什么新语法？](https://javastack.blog.csdn.net/article/details/118107000)
+
