@@ -479,7 +479,7 @@ Branch 'master' set up to track remote branch 'master' from 'origin'.
 
 然后 merge 远程即可
 
-
+[! [rejected] master -> master (non-fast-forward)（有推荐视频）](https://blog.csdn.net/lujinjian605894472/article/details/8443403)
 
 
 
