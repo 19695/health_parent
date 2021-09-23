@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * 基于 String[] 解析 excel 文件
  */
-public class POIUtils {
+public class PoiReadUtils {
 
     private static final String XLS = "xls";
     private static final String XLSX = "xlsx";

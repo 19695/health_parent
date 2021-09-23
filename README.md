@@ -855,3 +855,85 @@ try (InputStream in = new FileInputStream(file)) {
 
 参考：[卧槽！Java 中的 xx ≠ null 是什么新语法？](https://javastack.blog.csdn.net/article/details/118107000)
 
+
+
+### Java 大数常用类
+
+* BigInteger
+* BigDecimal
+
+不管是整数型还是浮点型，它们的表示范围和精度都是有限的。JAVA中有两个用于表示大数值的类BigInteger和BigDecimal，可以表示任意长度、任意精度。当整数跟浮点数的取值范围或精度不能满足要求时，就需要用更大或者精度更高的类型BigInteger和BigDecimal了
+
+| 枚举项      | 解释                                                         |
+| ----------- | ------------------------------------------------------------ |
+| UP          | 舍入远离零的舍入模式。 在丢弃非零部分之前始终增加数字(始终对非零舍弃部分前面的数字加1)。 此舍入模式始终不会减少计算值的大小。 |
+| DOWN        | 接近零的舍入模式。 在丢弃某部分之前始终不增加数字(从不对舍弃部分前面的数字加1，即截断)。 此舍入模式始终不会增加计算值的大小。 |
+| CEILING     | 接近正无穷大的舍入模式。 如果 BigDecimal 为正，则舍入行为与 UP 相同。 如果为负，则舍入行为与 DOWN 相同。 此舍入模式始终不会减少计算值。 |
+| FLOOR       | 接近负无穷大的舍入模式。 如果 BigDecimal 为正，则舍入行为与 DOWN 相同。 如果为负，则舍入行为与 UP 相同。 此舍入模式始终不会增加计算值。 |
+| HALF_UP     | 向“最接近的”数字舍入，如果与两个相邻数字的距离相等，则为向上舍入。 如果舍弃部分 >= 0.5，则舍入行为与 UP 相同;否则舍入行为与 ROUND_DOWN 相同。(四舍五入)。 |
+| HALF_DOWN   | 向”最接近的”数字舍入，如果与两个相邻数字的距离相等，则向下舍入。 如果舍弃部分 > 0.5，则舍入行为与 UP 相同;否则舍入行为与 DOWN 相同(五舍六入)。 |
+| HALF_EVEN   | 向“最接近的”数字舍入，如果与两个相邻数字的距离相等，则向相邻的偶数舍入。 如果舍弃部分左边的数字为奇数，则舍入行为与 HALF_UP 相同; 如果为偶数，则舍入行为与 HALF_DOWN 相同。 在重复进行一系列计算时，此舍入模式可以将累加错误减到最小。 此舍入模式也称为“银行家舍入法”，主要在美国使用。四舍六入，五分两种情况。 如果前一位为奇数，则入位，否则舍去。 以下例子为保留小数点1位，那么这种舍入方式下的结果。 1.15>1.2 1.25>1.2 |
+| UNNECESSARY | 用于断言请求的操作具有精确结果的舍入模式，因此不需要舍入。 如果对获得精确结果的操作指定此舍入模式，则抛出ArithmeticException。 |
+
+参考：https://blog.csdn.net/bupa900318/article/details/80330426
+
+以下摘抄自 jdk15 javadoc
+
+| Input Number | UP   | DOWN | CEILING | FLOOR | HLF_UP | hALF_DOWN | HALF_EVEN | UNNECESSARY               |
+| ------------ | ---- | ---- | ------- | ----- | ------ | --------- | --------- | ------------------------- |
+| 5.5          | 6    | 5    | 6       | 5     | 6      | 5         | 6         | throw ArithmeticException |
+| 2.5          | 3    | 2    | 3       | 2     | 3      | 2         | 2         | throw ArithmeticException |
+| 1.6          | 2    | 1    | 2       | 1     | 2      | 2         | 2         | throw ArithmeticException |
+| 1.1          | 2    | 1    | 2       | 1     | 1      | 1         | 1         | throw ArithmeticException |
+| 1.0          | 1    | 1    | 1       | 1     | 1      | 1         | 1         | 1                         |
+| -1.0         | -1   | -1   | -1      | -1    | -1     | -1        | -1        | -1                        |
+| -1.1         | -2   | -1   | -1      | -2    | -1     | -1        | -1        | throw ArithmeticException |
+| -1.6         | -2   | -1   | -1      | -2    | -2     | -2        | -2        | throw ArithmeticException |
+| -2.5         | -3   | -2   | -2      | -3    | -3     | -2        | -2        | throw ArithmeticException |
+| -5.5         | -6   | -5   | -5      | -6    | -6     | -5        | -6        | throw ArithmeticException |
+
+另外在 jdk9 之前 Rounding Modes（舍入模式）使用的是 BigDecimal 中声明的常量来设置，而在 jdk9 之后类中的常量被弃用了，改为使用 java.math.RoundingMode枚举类
+
+```java
+/**
+Rounding mode to round away from zero. Always increments the digit prior to a nonzero discarded fraction. Note that this rounding mode never decreases the magnitude of the calculated value.
+Deprecated
+Use RoundingMode.UP instead.
+*/    
+@Deprecated(since="9")
+public static final int ROUND_UP =           0;
+```
+
+
+
+### Springboot 中的文件上传
+
+参考：[Spring Boot教程(十三)：Spring Boot文件上传](https://blog.csdn.net/gnail_oug/article/details/80324120)
+
+* 单文件上传
+
+```java
+@PostMapping("/upload")
+@ResponseBody
+public String upload(@RequestParam("file") MultipartFile file) {
+    ...
+}
+```
+
+
+
+* 多文件上传
+    * 方式一：声明 MultipartFile 数组
+        我们在使用 MultipartFile 作为参数传递的时候，可以将 MultipartFile 声明为一个数组，这样就能支持多文件传输
+        参考上面的文章：[深入理解MultipartFile，以更优雅的方式处理文件](https://blog.csdn.net/qq_36314960/article/details/104775557)
+    * 方式二：
+
+```java
+@PostMapping("/multiUpload")
+@ResponseBody
+public String multiUpload(HttpServletRequest request) {
+    List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
+    ...
+}
+```
+
