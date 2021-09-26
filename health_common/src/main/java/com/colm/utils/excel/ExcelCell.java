@@ -16,6 +16,8 @@ public @interface ExcelCell {
     String title();
     // 舍入模式
     RoundingMode roundingMode() default RoundingMode.HALF_EVEN;
+    // 小数位数
+    int scaleLen() default 0;
     // 时间日期格式
     String dateFormat() default "";
 }

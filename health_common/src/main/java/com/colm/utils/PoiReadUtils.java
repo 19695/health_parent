@@ -17,7 +17,7 @@ public class PoiReadUtils {
 
     private static final String XLS = "xls";
     private static final String XLSX = "xlsx";
-    private static final String DATE_FORMAT = "yyyy/MM/dd";
+    public static final String DATE_FORMAT = "yyyy/MM/dd";
 
     /**
      * 读入 excel 文件，解析后返回内容

@@ -7,11 +7,12 @@ import java.math.RoundingMode;
 
 @Data
 public class ExcelFieldInfo {
-    Class<?> propertyType;
-    Method readMethod;
-    Method writeMethod;
-    int index;
-    String title;
-    RoundingMode roundingMode;
-    String dateFormat;
+    private Class<?> propertyType;
+    private Method readMethod;
+    private Method writeMethod;
+    private int index;
+    private String title;
+    private RoundingMode roundingMode;
+    private int scaleLen;
+    private String dateFormat;
 }
