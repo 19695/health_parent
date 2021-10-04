@@ -483,13 +483,52 @@ Branch 'master' set up to track remote branch 'master' from 'origin'.
 
 
 
+### Invalid bound statement (not found)
+
+问题详述：
+
+> org.apache.ibatis.binding.BindingException: Invalid bound statement (not found): com.colm.dao.OrderSettingDao.getOrderSettingByMonth
 
 
 
+网上查了一下都是说 [Invalid bound statement (not found)错误的可能原因](https://www.bilibili.com/read/cv4957285/)
+
+1. mapper.xml 里面的 namespace与实际类不一样
+2. mapper接口的函数名称和mapper.xml里面的标签id不一致
+3. 构建没有进去，请看一下target文件夹下面这些是否存在，没有请重新构建
+4. 扫包是否添加，我的是添加在springboot启动类上面的，如果是配置类请百度一下
+5. 配置文件写错
 
 
 
+检查了上述所说没有解决我的问题，然后我就清理下 IDE 缓存考虑可能是编译器缓存导致不一致问题，但是没有奏效。
 
+然后开始 debug，直到跟到源码发现其他的 Dao 都可以在 configuration 中找到映射，但是就我当前这个 Dao 中的方法一个都没有找到
+
+> 当前方法为 com.colm.dao.OrderSettingDao.getOrderSettingByMonth
+
+![image-20211004210936494](imgs/image-20211004210936494.png)
+
+> 查看 configuration 中所有已经注册的映射关系（可以看到我们当前接口中的方法一个都没有）
+
+![image-20211004211152964](imgs/image-20211004211152964.png)
+
+那此时考虑还是哪个地方的名称对应有问题，最后发现是我的 mapper 映射 xml 文件名称和接口的名称不一致
+
+* OrderSettingDao.java
+* OrderSettingtDao.xml
+
+将名称改为一致问题得到了解决，但是引出一个新的问题：
+
+#### mybatis 要求 mapper 接口和映射文件名一致么？
+
+1. 在注册映射文件时使用 `<package name="包名">` 标签时，需要映射文件名和接口名一样，不然会报错。
+
+2. 在注册映射文件时使用 `<mapper class="">` mapper标签的class属性时，需要映射文件名和接口名一样，不然会报错。
+
+3. 在注册映射文件时使用 `<mapper resource="org/xx/demo/mapper/xx.xml"/>`，不需要映射文件名和接口名一样
+
+参考：[解决 mybatis mapper配置文件与接口名称必须一致问题](https://www.cnblogs.com/west-iversion/p/12168069.html)
 
 
 
@@ -936,4 +975,74 @@ public String multiUpload(HttpServletRequest request) {
     ...
 }
 ```
+
+
+
+### MySql 通过内置函数进行批量更新
+
+将所有的 `2019-03` 的日期改为 `2021-09` 的日期
+
+```sql
+UPDATE t_ordersetting 
+SET orderDate = CONCAT('2021-09-', RIGHT(DATE_FORMAT(orderDate, '%Y-%m-%d'), 2)) 
+WHERE DATE_FORMAT(orderDate, '%Y-%m') LIKE '2019-03';
+```
+
+> 2019-03-04 -->  2021-09-04
+
+
+
+### mybatis 增删改 返回值问题
+
+mapper.xml的 增加 更新 删除 没有 resultMap\resultType 属性，但是可以直接在接口方法声明返回类型
+
+返回值可以是：
+
+* void
+* Integer
+* Long
+* Boolean
+
+
+
+### MySql 中关于 date、datetime、timestamp 的思考
+
+#### datetime
+
+1、保存格式为YYYYMMDDHHMMSS（年月日时分秒）的整数，所以，它与时区无关，存入的是什么值就是什么值，不会根据当前时区进行转换。
+
+2、从mysql 5.6.4中，可以存储小数片段，最多到小数点后6位，显示时格式为 yyyy-MM-dd HH:mm:ss[.222222]
+
+ mysql5.5中，没有小数片段，精确到秒。所以，我再从5.6版本迁移到5.5时，因生成的sql中datetime(6)有小数片段,无法导入。
+
+3、存储范围：从1000-01-01 00:00:00 到'9999-12-31 23:59:59'
+
+4、长度，8个字节，datetime(n),n不是存储长度，而是显示的小数位数，即使小数位数是0，存储是也是存储的6位小数，仅仅显示0位而已;要想显示小数，设置datetime(n),n=3显示小数点后3位，毫秒,n=6显示小数点后6位，微秒。
+
+ 
+
+#### timestamp
+
+1、存入的是自1970-01-01午夜(格林尼治标准时间)以来的秒数，它和unix时间戳相同。所以它与时区有关，查询时转为相应的时区时间。比如，存储的是1970-01-01 00:00:00，客户端是北京，那么就加8个时区的小时1970-01-01 08:00:00。
+
+2、有小数片段，至少从5.5就开始有
+
+3、存储范围：'1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' 
+
+4、可以当做时间戳使用，在更新时，自动更新，这一列只能由系统自动更新，不能由sql更新，这个在乐观锁时有广泛的应用
+
+6、长度，4字节，因为存储长度的原因，决定了它支持的范围的比datetime的要小
+
+7、显示时，显示日期和时间
+
+ 
+
+#### datetime和timestamp都可以当作时间戳使用
+
+datetime和timestamp都可以设置默认值，并且在其他列值更新时更新为当前时间，DEFAULT  CURRENT_TIMESTAMP和ON UPDATE CURRENT_TIMESTAMP，这俩子句可以一起使用，顺序无所谓，一起使用的意思是，默认值是当前时间并且在其他列更新值时，此列更新为当前时间。
+
+
+#### date
+
+date，时分秒都存储了，但只显示日期。对应Java中的java.sql.Date
 

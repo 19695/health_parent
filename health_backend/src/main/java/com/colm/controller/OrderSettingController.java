@@ -6,10 +6,7 @@ import com.colm.entity.Result;
 import com.colm.pojo.OrderSetting;
 import com.colm.service.OrderSettingService;
 import com.colm.utils.PoiReadUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ordersetting")
@@ -40,6 +38,7 @@ public class OrderSettingController {
                     orderSettings.add(orderSetting);
                 } catch (ParseException e) {
                     e.printStackTrace();
+                    return new Result(false, MessageConstant.IMPORT_ORDERSETTING_FAIL);
                 }
             }
             orderSettingService.batchSave(orderSettings);
@@ -50,4 +49,25 @@ public class OrderSettingController {
         return new Result(true, MessageConstant.IMPORT_ORDERSETTING_SUCCESS);
     }
 
+    @PostMapping("/getOrderSettingByMonth")
+    public Result getOrderSettingByMonth(String date) { // date 格式为 yyyy-MM
+        try {
+            List<Map> list = orderSettingService.getOrderSettingByMonth(date);
+            return new Result(true,MessageConstant.GET_ORDERSETTING_SUCCESS,list);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false,MessageConstant.GET_ORDERSETTING_FAIL);
+        }
+    }
+
+    @PostMapping("/editNumberByDate")
+    public Result editNumberByDate(@RequestBody OrderSetting orderSetting) {
+        try{
+            orderSettingService.editNumberByDate(orderSetting);
+            return new Result(true,MessageConstant.ORDERSETTING_SUCCESS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false,MessageConstant.ORDERSETTING_FAIL);
+        }
+    }
 }

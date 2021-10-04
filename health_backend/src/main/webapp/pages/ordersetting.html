@@ -128,7 +128,7 @@
         new Vue({
             el: '#app',
             data:{
-                today:new Date(),//当前日期
+                today:'',//当前日期
                 currentDay: 1,
                 currentMonth: 1,
                 LocalMonth: 1,
@@ -147,7 +147,7 @@
                     this.$prompt('请输入可预约人数', '预约设置', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-                        inputPattern: /^[0-9]*[1-9][0-9]*$/,
+                        inputPattern: /^[0-9]*$/,
                         inputErrorMessage: '只能输入正整数'
                     }).then(({ value }) => {
                         //发送ajax请求，将输入的数据提交到Controller
@@ -204,6 +204,12 @@
 
                 //初始化当前页要展示的日期
 				initData: function (cur) {
+                    var current = new Date();
+                    current.setHours(0);
+                    current.setMinutes(0);
+                    current.setSeconds(0);
+                    this.today = current;
+
                     var date;
                     var index = 0;   //控制显示预定的天数
                     if (cur) {
@@ -264,13 +270,15 @@
                     ];*/
 
                     //发送ajax请求，根据当前页面对应的月份查询数据库，封装成相应结果赋值给leftobj模型数据，用于页面展示
-                    // axios.post("/ordersetting/getOrderSettingByMonth.do?date=" + this.currentYear + "-" + this.currentMonth).then((res) => {
-                    //     if(res.data.flag){
-                    //         this.leftobj = res.data.data;
-                    //     }else{
-                    //         this.$message.error(res.data.message);
-                    //     }
-                    // });
+                    axios.post("/ordersetting/getOrderSettingByMonth.do?date=" + this.currentYear + "-" + this.currentMonth).then((res) => {
+                        if(res.data.flag){
+                            this.leftobj = res.data.data;
+                            console.log(this.leftobj)
+                            console.log(this.today)
+                        }else{
+                            this.$message.error(res.data.message);
+                        }
+                    });
                 },
 				//切换到当前月份
                 goCurrentMonth: function (year, month) {
