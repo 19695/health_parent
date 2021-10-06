@@ -5,7 +5,7 @@ import com.colm.constant.MessageConstant;
 import com.colm.entity.Result;
 import com.colm.pojo.OrderSetting;
 import com.colm.service.OrderSettingService;
-import com.colm.utils.PoiReadUtils;
+import com.colm.utils.POIReadUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +27,9 @@ public class OrderSettingController {
     @PostMapping("/upload")
     public Result upload(@RequestParam("")MultipartFile file) {
         try {
-            List<String[]> values = PoiReadUtils.readExcel(file);
+            List<String[]> values = POIReadUtils.readExcel(file);
             List<OrderSetting> orderSettings = new ArrayList<>();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PoiReadUtils.DATE_FORMAT);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(POIReadUtils.DATE_FORMAT);
             for (String[] value : values) {
                 try {
                     Date date = simpleDateFormat.parse(value[0]);
